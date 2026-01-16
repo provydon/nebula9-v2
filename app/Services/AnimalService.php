@@ -47,11 +47,9 @@ class AnimalService
         return $animal->delete();
     }
 
-    public function transfer(int $animalId, int $targetEnclosureId)
+    public function transfer(Animal $animal, int $targetEnclosureId)
     {
-        $animal = $this->getById($animalId);
         $this->validatePlacement($targetEnclosureId, $animal->preferred_environment);
-
         $animal->update(['enclosure_id' => $targetEnclosureId]);
 
         return $animal->refresh();
