@@ -58,51 +58,187 @@ php artisan test
 
 ## API Endpoints
 
+### Base URL
+```
+http://localhost:8000/api
+```
+
 ### Enclosures
 
-- `GET /api/enclosures` - List all enclosures (supports `?type=`, `?available=1`, `?full=1`)
-- `GET /api/enclosures/{id}` - Show enclosure details
-- `POST /api/enclosures` - Create new enclosure
-- `PUT /api/enclosures/{id}` - Update enclosure
-- `DELETE /api/enclosures/{id}` - Delete enclosure
+#### List All Enclosures
+```bash
+curl -X GET "http://localhost:8000/api/enclosures" \
+  -H "Accept: application/json"
+```
+
+**With Filters:**
+```bash
+# Filter by type
+curl -X GET "http://localhost:8000/api/enclosures?type=Savannah" \
+  -H "Accept: application/json"
+
+# Get available enclosures
+curl -X GET "http://localhost:8000/api/enclosures?available=1" \
+  -H "Accept: application/json"
+
+# Get full enclosures
+curl -X GET "http://localhost:8000/api/enclosures?full=1" \
+  -H "Accept: application/json"
+```
+
+#### Show Enclosure
+```bash
+curl -X GET "http://localhost:8000/api/enclosures/1" \
+  -H "Accept: application/json"
+```
+
+#### Create Enclosure
+```bash
+curl -X POST "http://localhost:8000/api/enclosures" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Savannah Enclosure",
+    "type": "Savannah",
+    "capacity": 10
+  }'
+```
+
+#### Update Enclosure
+```bash
+curl -X PUT "http://localhost:8000/api/enclosures/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Savannah Enclosure",
+    "capacity": 15
+  }'
+```
+
+#### Delete Enclosure
+```bash
+curl -X DELETE "http://localhost:8000/api/enclosures/1" \
+  -H "Accept: application/json"
+```
 
 ### Animals
 
-- `GET /api/animals` - List all animals (supports `?specie=`, `?preferred_environment=`, `?enclosure_id=`)
-- `GET /api/animals/{id}` - Show animal details
-- `POST /api/animals` - Create new animal
-- `PUT /api/animals/{id}` - Update animal
-- `DELETE /api/animals/{id}` - Delete animal
-- `POST /api/animals/{animal}/transfer` - Transfer animal to another enclosure
-
-### Example Requests
-
-**Create an enclosure:**
+#### List All Animals
 ```bash
-POST /api/enclosures
+curl -X GET "http://localhost:8000/api/animals" \
+  -H "Accept: application/json"
+```
+
+**With Filters:**
+```bash
+# Filter by specie
+curl -X GET "http://localhost:8000/api/animals?specie=Panthera%20leo" \
+  -H "Accept: application/json"
+
+# Filter by preferred environment
+curl -X GET "http://localhost:8000/api/animals?preferred_environment=Savannah" \
+  -H "Accept: application/json"
+
+# Filter by enclosure
+curl -X GET "http://localhost:8000/api/animals?enclosure_id=1" \
+  -H "Accept: application/json"
+```
+
+#### Show Animal
+```bash
+curl -X GET "http://localhost:8000/api/animals/1" \
+  -H "Accept: application/json"
+```
+
+#### Create Animal (Without Enclosure)
+```bash
+curl -X POST "http://localhost:8000/api/animals" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Lion",
+    "specie": "Panthera leo",
+    "preferred_environment": "Savannah"
+  }'
+```
+
+#### Create Animal (With Enclosure)
+```bash
+curl -X POST "http://localhost:8000/api/animals" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Lion",
+    "specie": "Panthera leo",
+    "preferred_environment": "Savannah",
+    "enclosure_id": 1
+  }'
+```
+
+**Note:** This will validate:
+- Rule #1: `preferred_environment` must match enclosure `type`
+- Rule #2: Enclosure must have available space
+
+#### Update Animal
+```bash
+curl -X PUT "http://localhost:8000/api/animals/1" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Lion Name"
+  }'
+```
+
+#### Delete Animal
+```bash
+curl -X DELETE "http://localhost:8000/api/animals/1" \
+  -H "Accept: application/json"
+```
+
+#### Transfer Animal
+```bash
+curl -X POST "http://localhost:8000/api/animals/1/transfer" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_enclosure_id": 2
+  }'
+```
+
+**Note:** Transfer validates both business rules:
+- Rule #1: Animal's `preferred_environment` must match target enclosure `type`
+- Rule #2: Target enclosure must have available space
+
+### Error Responses
+
+#### Validation Error (422)
+```json
 {
-  "name": "Savannah Enclosure",
-  "type": "Savannah",
-  "capacity": 10
+  "message": "Animal's preferred environment (Aquatic) does not match enclosure type (Savannah)",
+  "errors": {
+    "enclosure_id": [
+      "Animal's preferred environment (Aquatic) does not match enclosure type (Savannah)"
+    ]
+  }
 }
 ```
 
-**Add an animal:**
-```bash
-POST /api/animals
+#### Not Found (404)
+```json
 {
-  "name": "Lion",
-  "specie": "Panthera leo",
-  "preferred_environment": "Savannah",
-  "enclosure_id": 1
+  "message": "Resource not found."
 }
 ```
 
-**Transfer an animal:**
-```bash
-POST /api/animals/1/transfer
+#### Full Enclosure Error (422)
+```json
 {
-  "target_enclosure_id": 2
+  "message": "Enclosure is at maximum capacity (10)",
+  "errors": {
+    "enclosure_id": [
+      "Enclosure is at maximum capacity (10)"
+    ]
+  }
 }
 ```
 
