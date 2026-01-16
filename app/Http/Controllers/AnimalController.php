@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAnimalRequest;
 use App\Http\Requests\TransferAnimalRequest;
 use App\Http\Requests\UpdateAnimalRequest;
+use App\Models\Animal;
 use App\Services\AnimalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,45 +18,33 @@ class AnimalController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        return response()->json(
-            $this->service->getAll($request->only(['specie', 'preferred_environment', 'enclosure_id']))
-        );
+        return response()->json($this->service->getAll($request->only(['specie', 'preferred_environment', 'enclosure_id'])));
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Animal $animal): JsonResponse
     {
-        return response()->json($this->service->getById($id));
+        return response()->json($animal->load('enclosure'));
     }
 
     public function store(StoreAnimalRequest $request): JsonResponse
     {
-        return response()->json(
-            $this->service->create($request->validated()),
-            201
-        );
+        return response()->json($this->service->create($request->validated()), 201);
     }
 
-    public function update(UpdateAnimalRequest $request, int $id): JsonResponse
+    public function update(UpdateAnimalRequest $request, Animal $animal): JsonResponse
     {
-        return response()->json(
-            $this->service->update(
-                $this->service->getById($id),
-                $request->validated()
-            )
-        );
+        return response()->json($this->service->update($animal, $request->validated()));
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Animal $animal): JsonResponse
     {
-        $this->service->delete($this->service->getById($id));
+        $this->service->delete($animal);
 
-        return response()->json(['message' => 'Animal deleted'], 200);
+        return response()->json(['message' => 'Animal deleted']);
     }
 
-    public function transfer(TransferAnimalRequest $request, int $animal): JsonResponse
+    public function transfer(TransferAnimalRequest $request, Animal $animal): JsonResponse
     {
-        return response()->json(
-            $this->service->transfer($animal, $request->validated()['target_enclosure_id'])
-        );
+        return response()->json($this->service->transfer($animal, $request->validated()['target_enclosure_id']));
     }
 }
