@@ -27,19 +27,11 @@ git clone https://github.com/provydon/nebula9-v2
 cd nebula9-v2
 ```
 
-2. Install dependencies:
+2. Install dependencies, set up environment, and run migrations:
 ```bash
 composer install
-```
-
-3. Set up environment:
-```bash
 cp .env.example .env
 php artisan key:generate
-```
-
-4. Run migrations:
-```bash
 php artisan migrate --seed
 ```
 
