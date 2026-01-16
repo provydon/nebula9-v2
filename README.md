@@ -23,7 +23,7 @@ A Laravel-based REST API for managing zoo enclosures and animals with business r
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/provydon/nebula9-v2
 cd nebula9-v2
 ```
 
