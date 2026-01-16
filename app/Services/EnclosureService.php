@@ -10,9 +10,9 @@ class EnclosureService
     {
         return Enclosure::with('animals')
             ->withCount('animals')
-            ->when(isset($filters['type']), fn($q) => $q->byType($filters['type']))
-            ->when(!empty($filters['available']), fn($q) => $q->available())
-            ->when(!empty($filters['full']), fn($q) => $q->full())
+            ->when(isset($filters['type']), fn ($q) => $q->byType($filters['type']))
+            ->when(! empty($filters['available']), fn ($q) => $q->available())
+            ->when(! empty($filters['full']), fn ($q) => $q->full())
             ->get();
     }
 
@@ -31,6 +31,7 @@ class EnclosureService
     public function update(Enclosure $enclosure, array $data)
     {
         $enclosure->update($data);
+
         return $enclosure->refresh();
     }
 
