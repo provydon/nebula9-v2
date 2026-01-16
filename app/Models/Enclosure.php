@@ -35,13 +35,15 @@ class Enclosure extends Model
     public function scopeAvailable(Builder $query): Builder
     {
         return $query->withCount('animals')
-            ->havingRaw('capacity > animals_count');
+            ->havingRaw('capacity > animals_count')
+            ->groupBy('enclosures.id');
     }
 
     public function scopeFull(Builder $query): Builder
     {
         return $query->withCount('animals')
-            ->havingRaw('capacity <= animals_count');
+            ->havingRaw('capacity <= animals_count')
+            ->groupBy('enclosures.id');
     }
 
     // Accessors - use withCount for better performance

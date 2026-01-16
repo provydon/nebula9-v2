@@ -48,6 +48,10 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], 404);
                 }
 
+                if ($e instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
+                    return $e->getResponse();
+                }
+
                 if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
                     return response()->json([
                         'message' => $e->getMessage() ?: 'An error occurred.',
