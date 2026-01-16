@@ -40,7 +40,7 @@ php artisan key:generate
 
 4. Run migrations:
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
 
 5. Start the development server:
