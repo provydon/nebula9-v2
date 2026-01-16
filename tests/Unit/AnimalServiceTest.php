@@ -71,7 +71,7 @@ test('transfers animal to valid enclosure', function () {
     ]);
     $service = new AnimalService;
 
-    $transferred = $service->transfer($animal->id, $targetEnclosure->id);
+    $transferred = $service->transfer($animal, $targetEnclosure->id);
 
     expect($transferred->enclosure_id)->toBe($targetEnclosure->id);
 });
@@ -85,6 +85,6 @@ test('rejects transfer when environment does not match', function () {
     ]);
     $service = new AnimalService;
 
-    expect(fn () => $service->transfer($animal->id, $targetEnclosure->id))
+    expect(fn () => $service->transfer($animal, $targetEnclosure->id))
         ->toThrow(ValidationException::class);
 });
