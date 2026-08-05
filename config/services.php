@@ -25,7 +25,12 @@ return [
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+        // SES verifies sender identities per region, so the mailer needs its own
+        // setting. Sharing AWS_DEFAULT_REGION with the S3 disk means repointing a
+        // bucket silently moves the mailer too, and mail then fails with
+        // "Email address is not verified". Falls back to AWS_DEFAULT_REGION so a
+        // single-region deployment is unaffected.
+        'region' => env('SES_REGION', env('AWS_DEFAULT_REGION', 'us-east-1')),
     ],
 
     'slack' => [
